@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition template="/WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core" 
+                xmlns:h="http://java.sun.com/jsf/html" 
+                xmlns:ui="http://java.sun.com/jsf/facelets" 
+                xmlns:p="http://primefaces.org/ui">
+
+    <ui:define name="page">
+
+        <h:form id="form">
+
+            <p:messages id="msg" />
+            <p:panel header="Sign in" style="width: 32%;">
+
+                <p:panelGrid columns="2" id="panel">
+
+                    <p:outputLabel for="username" value="Username:"/>
+                    <p:inputText id="username"  required="true" value="#{user.userName}" requiredMessage="Invald username or password"/>
+                    <p:outputLabel for="password" value="Password:"/>
+                    <p:password id="password"   required="true" value="#{user.password}" requiredMessage=""/>
+
+
+                </p:panelGrid> 
+                <p:panelGrid columns="2">
+                    <p:commandButton value="Submit" update="form" />
+                    <p:panelGrid columns="2" >
+                        <p:link value="forget password" href="forget.xhtml" />
+                        <p:link value="register" href="register.xhtml"/>
+                    </p:panelGrid>
+                </p:panelGrid>
+            </p:panel>
+
+        </h:form>
+        <p:dataList value="" var="m" rows="10" styleClass="paginated" type="definition" emptyMessage="No messages">
+            <f:facet name="header">
+                Messages
+            </f:facet>
+            <fieldset>
+                <legend>user</legend>
+                <h:outputText value="Message 1" style="display: block"/>
+            </fieldset>
+            <fieldset>
+                <legend>user</legend>
+                <h:outputText value="Message 2"/>
+            </fieldset>
+        </p:dataList>
+
+    </ui:define>
+</ui:composition>
+

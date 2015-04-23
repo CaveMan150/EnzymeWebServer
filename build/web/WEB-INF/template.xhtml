@@ -1,0 +1,77 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:h="http://java.sun.com/jsf/html"
+      xmlns="http://www.w3.org/1999/xhtml"  
+      xmlns:ui="http://java.sun.com/jsf/facelets" 
+      xmlns:p="http://primefaces.org/ui">
+
+    <h:head>
+        <title>ENZYME</title>
+    </h:head>
+    <h:body style="background: #ccffff">
+
+
+        <div style="background: white">
+
+            <center>
+                <img src="img/enz.png"/>
+                <br/>
+
+            </center>
+            <p:growl id="growl"  />
+
+            <p:outputPanel id = "nav">
+                <p:commandLink  style=" float: left;" onclick="PF('postm').show();" rendered="#{activeUser.isValidUser=='true'}"><img style="border: 5px; border-style: outset; border-color: green " src="img/post.png"/></p:commandLink>
+                <a href="index.xhtml" ><img style="border: 5px; border-style: outset; border-color: green " src="img/home.gif"/></a>
+                <p:commandLink  style=" padding: 5px;" onclick="PF('signin').show();" rendered="#{activeUser.isValidUser=='false'}"><img style="border: 5px; border-style: outset; border-color: green " src="img/signin.png"/></p:commandLink>
+                <p:link style=" padding: 5px;" href="register.xhtml" rendered="#{activeUser.isValidUser=='false'}" ><img style="border: 5px; border-style: outset; border-color: green " src="img/register.png"/></p:link>
+
+                <p:commandLink immediate="true"  style=" padding: 5px;" action="#{activeUser.getProfile(activeUser.userName)}" rendered="#{activeUser.isValidUser=='true'}"><img style="border: 5px; border-style: outset; border-color: green " src="img/myprof.png"/></p:commandLink>
+                <p:commandLink immediate="true"  action="#{activeUser.signOut()}" rendered="#{activeUser.isValidUser=='true'}"><img style="border: 5px; border-style: outset; border-color: green " src="img/LogOut.png"/></p:commandLink>
+
+            </p:outputPanel>
+            <p:dialog modal="true" header="Sign in" widgetVar="signin" showEffect="explode" hideEffect="bounce" >
+                <h:form id="sf" rendered="#{activeUser.isValidUser=='false'}">
+                    <p:panelGrid columns="2" id="panel"> 
+
+                        <p:outputLabel  for="username" value="Username:"/>
+                        <p:inputText required="true" id="username"   value="#{activeUser.userName}" requiredMessage="Empty username" />
+                        <p:outputLabel for="password" value="Password:"/>
+                        <p:password required="true" id="password"  value="#{activeUser.password}" requiredMessage="Empty passowrd" />
+                    </p:panelGrid> 
+                    <p:panelGrid columns="2">
+                        <p:commandButton value="Sign in" update="nav sf growl" action="#{activeUser.signIn()}" onclick="PF('signin').hide();" />
+                        <p:link value="Forget password" href="forget.xhtml" />
+                    </p:panelGrid>
+
+                </h:form>
+            </p:dialog>
+
+
+            <p:dialog modal="true" header="Post your Message" widgetVar="postm" showEffect="explode" hideEffect="bounce" >
+                <h:form>
+                    <p:panel id="post">
+                        <p:inputTextarea rows="5" value="#{activeUser.currentMsg.content}" cols="50" counter="display" maxlength="140" counterTemplate="{0} characters remaining." autoResize="false" />   
+                        <br/>
+                        <h:outputText id="display" />  
+                        <br/>
+                        <p:panelGrid columns="2">
+                            <p:commandButton value="Post message" update="msgN post con con3"   action="#{activeUser.postMessage()}" onclick="PF('postm').hide();"/>
+                            <p:inputSwitch value="#{activeUser.currentMsg.isPublic}" onLabel="Public" offLabel="Followers" />
+                        </p:panelGrid>
+                    </p:panel>
+                </h:form>
+            </p:dialog>
+
+        </div>
+        <div id="page">
+            
+            <ui:insert name="page">
+                Welcome
+            </ui:insert>
+        </div>
+
+
+    </h:body>
+</html>
+

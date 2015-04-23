@@ -1,0 +1,169 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition template="/WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core" 
+                xmlns:h="http://java.sun.com/jsf/html" 
+                xmlns:ui="http://java.sun.com/jsf/facelets" 
+                xmlns:p="http://primefaces.org/ui">
+
+    <ui:define name="page">
+        <p:panel id="all" style=" background: ##{activeUser.profileUser.bgcolor}">
+            <p:panel id="userInfo" header="#{activeUser.profileUser.userName}" style=" background: ##{activeUser.profileUser.bgcolor}" >
+                <p:panelGrid columns="2" >
+                    <img src="img/prof.jpg"/>   
+                    <p:panelGrid columns="2" id="panel" style="margin: 0 auto;">
+
+                        <p:outputLabel value="Name:"/>
+                        <p:outputLabel value="#{activeUser.profileUser.name}"/>
+                        <p:outputLabel value="Phone:"/>
+                        <p:outputLabel value="#{activeUser.profileUser.phoneNumber}"/>
+                        <p:outputLabel value="Birthdate:"/>
+                        <p:outputLabel value="#{activeUser.profileUser.formattedDate}"/>
+                        <p:commandButton id="f" value="#{activeUser.profileUser.follow}" update="f fn con2" action="#{activeUser.follow()}" rendered="#{activeUser.isValidUser=='true' and (not (activeUser.userName==activeUser.profileUser.userName))}"/>
+
+                    </p:panelGrid>
+                    <p:panelGrid style="margin: 0 auto;" columns="3" >
+                        <p:outputLabel value="Followers"/>
+                        <p:outputLabel value="Following"/>
+                        <p:outputLabel value="Messages"/>
+                        <p:commandLink id="fn" value="#{activeUser.profileUser.followersList.size()}" onclick="PF('followers').show();"/>
+                        <p:commandLink value="#{activeUser.profileUser.followingList.size()}" onclick="PF('following').show();"/>
+                        <p:outputLabel id="msgN"  value="#{activeUser.profileUser.messageList.size()}"/>
+
+                    </p:panelGrid>
+                    <p:panelGrid style="margin: 0 auto;" columns="4" id="buttons" rendered="#{(not empty activeUser.userName) and (activeUser.userName==activeUser.profileUser.userName)}">
+
+                        <p:commandButton value="Edit" onclick="PF('profileD').show();"/>
+                        <p:commandButton value="Change password"  onclick="PF('passD').show();"/>
+                        <h:form>
+                            <p:commandButton value="Delete account" action="#{activeUser.deleteAccount()}">
+                                <p:confirm header="Confirmation" message="Are you sure you want to delete your Account?" icon="ui-icon-alert" />
+                            </p:commandButton>
+                            <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">
+                                <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                            </p:confirmDialog>
+                        </h:form>
+                    </p:panelGrid>
+                </p:panelGrid>
+                <p:dialog modal="true" header="Followers" widgetVar="followers" showEffect="explode" hideEffect="bounce" >
+                    <p:dataScroller id="con2" value="#{activeUser.profileUser.followersList}" var="follower" chunkSize="10">
+
+                        <p:commandLink update="growl" immediate="true"   style="color:red" action="#{activeUser.getProfile(follower)}">@#{follower} </p:commandLink>
+
+                    </p:dataScroller>
+                </p:dialog>
+                <p:dialog modal="true" header="Following" widgetVar="following" showEffect="explode" hideEffect="bounce" >
+                    <p:dataScroller id="con4" value="#{activeUser.profileUser.followingList}" var="sub" rows="10"  chunkSize="10" >
+
+
+                        <p:commandLink update="growl" immediate="true"  style="color:red" action="#{activeUser.getProfile(sub)}">@#{sub} </p:commandLink>
+
+
+
+                    </p:dataScroller>
+                </p:dialog>
+            </p:panel>
+
+
+            <p:dataList id="con" value="#{activeUser.profileUser.messageList}" var="m" rows="10"  paginator="true" styleClass="paginated" type="definition" emptyMessage="No messages">
+                <f:facet name="header">
+                    Messages Posted by #{activeUser.profileUser.userName}
+                </f:facet>
+                <fieldset>
+                    <legend ><p:commandLink update="growl" immediate="true"  style="color:red" action="#{activeUser.getProfile(m.username)}">@#{m.username} </p:commandLink></legend>
+
+                    <h:outputText  value="#{m.content}" escape="false"/>
+                    <div style=" text-align: right" >
+                        <h:outputText style="color: gray"  value="Posted date: #{m.formattedDate}"/>
+                    </div>
+                </fieldset>
+
+            </p:dataList>
+
+            <p:panelGrid columns="2" style="width:100%;" rendered="#{(not empty activeUser.userName) and (activeUser.userName==activeUser.profileUser.userName)}">
+
+
+
+            </p:panelGrid>
+
+            <p:dataList id="con3" value="#{activeUser.profileUser.subscribedMessageList}" var="sm" rows="10"  paginator="true" styleClass="paginated" type="definition" emptyMessage="No messages">
+                <f:facet name="header">
+                    Messages Posted by people #{activeUser.profileUser.userName} follows 
+                </f:facet>
+                <fieldset>
+                    <legend ><p:commandLink update="growl" immediate="true"  style="color:red" action="#{activeUser.getProfile(sm.username)}">@#{sm.username} </p:commandLink></legend>
+
+                    <h:outputText value="#{sm.content}" escape="false"/>
+                    <div style=" text-align: right" >
+                        <h:outputText style="color: gray"  value="Posted date: #{sm.formattedDate}"/>
+                    </div>
+                </fieldset>
+
+            </p:dataList>
+
+        </p:panel>
+        <p:dialog modal="true" header="Edit Profile" widgetVar="profileD" showEffect="explode" hideEffect="bounce"  >
+
+            <h:form id="prof">
+                <p:panelGrid columns="1" >
+                    <p:panelGrid columns="3" id="panel">
+                        <p:outputLabel for="name" value="Name:"/>
+                        <p:inputText id="name" required="true" requiredMessage="You must enter a name" value="#{activeUser.profileUser.name}"/>
+                        <p:message for="name"/>
+                        <p:outputLabel for="birthdate" value="Birthdate:" />
+                        <p:calendar id="birthdate"  pattern="MM-dd-yyyy" mask="true" value="#{activeUser.profileUser.dateOfBirth}" required="true" requiredMessage="You must enter a birthdate"/>
+                        <p:message for="birthdate"/>
+                        <p:outputLabel for="phone" value="Phone #:"/>
+                        <p:inputMask id="phone" mask="(999) 999-9999" required="true" value="#{activeUser.profileUser.phoneNumber}" requiredMessage="You must enter a phone number"/>
+                        <p:message for="phone"/>
+                        <p:outputLabel for="bgcolor" value="Background color:"/>
+                        <p:colorPicker id="bgcolor" value="#{activeUser.profileUser.bgcolor}"/>
+                        <p:spacer/>
+
+                    </p:panelGrid> 
+                    <p:panelGrid columns="2" layout="grid">
+                        <p:commandButton value="Save changes" update="userInfo all" action="#{activeUser.updateProfile}" onclick="PF('profileD').hide();"/>
+
+                    </p:panelGrid>
+
+                </p:panelGrid>
+            </h:form>
+
+        </p:dialog>
+
+
+
+
+
+
+        <p:dialog modal="true" header="Change password" widgetVar="passD" showEffect="explode" hideEffect="bounce">
+
+            <h:form id="pass">
+                <p:panelGrid columns="1" >
+                    <p:panelGrid columns="3" id="panel">
+                        <p:outputLabel  value="Username:"/>
+                        <p:outputLabel value="#{activeUser.profileUser.userName}"/>
+                        <p:spacer/>
+                        <p:outputLabel for="password1" value="New Password:"/>
+                        <p:password id="password1" match="password2" required="true" value="#{activeUser.profileUser.password}" requiredMessage="You must enter a password" validatorMessage="Password does not match"/>
+                        <p:message for="password1"/>
+                        <p:outputLabel for="password2" value="Re-type password:"/>
+                        <p:password id="password2" required="true" requiredMessage="Passowrd cannot be empty"/>
+                        <p:message for="password2" display="password2"/>
+                    </p:panelGrid> 
+                    <p:panelGrid columns="2" layout="grid">
+                        <p:commandButton value="Change password" onclick="PF('passD').hide();" action="#{activeUser.updateProfile()}"/>
+                    </p:panelGrid>
+
+                </p:panelGrid>
+            </h:form>
+
+        </p:dialog>
+
+
+
+    </ui:define>
+</ui:composition>
+

@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition template="/WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core" 
+                xmlns:h="http://java.sun.com/jsf/html" 
+                xmlns:ui="http://java.sun.com/jsf/facelets" 
+                xmlns:p="http://primefaces.org/ui">
+
+    <ui:define name="page">
+
+        <h:form  style=" padding: 5px; float: right"> 
+            
+            <p:inputText value="#{activeUser.hashTagSearch}" style=" padding: 5px; " placeholder="search by hashtag" />
+            <p:commandButton action="#{activeUser.searchByHashTag(activeUser.hashTagSearch)}" update="con4" value="search" onclick="PF('searchResult').show();"/>
+        </h:form>
+        <br/>
+        <br/>
+        <br/>
+        
+        <p:dataScroller id="con" value="#{sharedBean.publicMessageList}" var="m"  chunkSize="20" >
+            <f:facet name="header">
+                Messages
+            </f:facet>
+            <fieldset>
+                <legend ><p:commandLink update="growl" immediate="true"  style="color:red" action="#{activeUser.getProfile(m.username)}">@#{m.username} </p:commandLink></legend>
+                <h:outputText  escape="false" value="#{m.content}"/>
+                    <div style=" text-align: right" >
+                        <h:outputText style="color: gray"  value="Posted date: #{m.formattedDate}"/>
+                    </div>
+            </fieldset>
+
+        </p:dataScroller>
+
+
+        <p:spacer id="con3"/>
+        <p:spacer id="msgN"/>
+
+
+        <p:dialog modal="true" header="Search Result" widgetVar="searchResult" showEffect="explode" hideEffect="bounce" >
+            <p:dataScroller id="con4" value="#{activeUser.searchList}" var="m"  chunkSize="20" >
+
+
+                <fieldset>
+                    <legend ><p:commandLink update="growl" immediate="true"   style="color:red" action="#{activeUser.getProfile(m.username)}">@#{m.username} </p:commandLink></legend>
+
+                    <h:outputText  value="#{m.content}" escape="false"/>
+                    <div style=" text-align: right" >
+                        <h:outputText style="color: gray"  value="Posted date: #{m.formattedDate}"/>
+                    </div>
+                </fieldset>
+
+
+
+            </p:dataScroller>
+        </p:dialog>
+    </ui:define>
+</ui:composition>
+
